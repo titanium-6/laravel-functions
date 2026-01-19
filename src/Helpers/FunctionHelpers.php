@@ -298,6 +298,54 @@ if (!function_exists('convert_meters_to_feet')) {
     }
 }
 
+if (!function_exists('convert_miles_to_meters')) {
+    /**
+     * convert_miles_to_meters
+     *
+     * @param  mixed $miles
+     * @param  mixed $precision
+     * @param  mixed $floor
+     * @return mixed
+     */
+    function convert_miles_to_meters($miles, $precision = 2, $floor = false)
+    {
+        if ($miles === null) return null;
+
+        $meters = $miles * 1609.344;
+
+        if ($floor) {
+            $multiplier = pow(10, $precision);
+            return floor($meters * $multiplier) / $multiplier;
+        }
+
+        return round($meters, $precision);
+    }
+}
+
+if (!function_exists('convert_miles_to_feet')) {
+    /**
+     * convert_miles_to_feet
+     *
+     * @param  mixed $miles
+     * @param  mixed $precision
+     * @param  mixed $floor
+     * @return mixed
+     */
+    function convert_miles_to_feet($miles, $precision = 2, $floor = false)
+    {
+        if ($miles === null) return null;
+
+        $feet = $miles * 5280;
+
+        if ($floor) {
+            $multiplier = pow(10, $precision);
+            return floor($feet * $multiplier) / $multiplier;
+        }
+
+        return round($feet, $precision);
+    }
+}
+
 if (!function_exists('adjust_brightness')) {
     /**
      * adjust_brightness
