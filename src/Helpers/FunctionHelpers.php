@@ -1100,12 +1100,18 @@ if (!function_exists('app_url')) {
      * app_url
      *
      * @param  mixed $path
-     * @param  mixed $default
+     * @param  mixed $type
      * @return mixed
      */
-    function app_url($path = null, $default = false)
+    function app_url($path = null, $type = null)
     {
-        $url = $default ? config('app.default_url') : config('app.url');
+        // Backwards compatibility
+        if ($type === true) $type = 'default';
+        if ($type === false) $type = null;
+
+        if ($type) $type = $type . '_';
+
+        $url = config('app.' . $type . 'url');
 
         return rtrim($url, '/') . '/' . ltrim($path, '/');
     }
