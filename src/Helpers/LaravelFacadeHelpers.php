@@ -24,6 +24,32 @@ if (!function_exists('http')) {
     }
 }
 
+if (!function_exists('http_safe')) {
+    /**
+     * Same fluent API as Http::. get/post/put/patch/delete/head return null on ConnectionException.
+     */
+    function http_safe(): object
+    {
+        return new class {
+            private $client;
+
+            public function __call(string $method, array $args): mixed
+            {
+                $this->client ??= \Illuminate\Support\Facades\Http::getFacadeRoot();
+                if (in_array($method, ['get', 'post', 'put', 'patch', 'delete', 'head'])) {
+                    try {
+                        return $this->client->{$method}(...$args);
+                    } catch (\Illuminate\Http\Client\ConnectionException $e) {
+                        return null;
+                    }
+                }
+                $this->client = $this->client->{$method}(...$args);
+                return $this;
+            }
+        };
+    }
+}
+
 if (!function_exists('storage')) {
     /**
      * storage
