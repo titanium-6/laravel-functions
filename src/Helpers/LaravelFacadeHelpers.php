@@ -27,6 +27,7 @@ if (!function_exists('http')) {
 if (!function_exists('http_safe')) {
     /**
      * Same fluent API as Http::. get/post/put/patch/delete/head return null on ConnectionException.
+     * pool() returns the array of responses directly (not the wrapper).
      */
     function http_safe(): object
     {
@@ -42,6 +43,9 @@ if (!function_exists('http_safe')) {
                     } catch (\Illuminate\Http\Client\ConnectionException $e) {
                         return null;
                     }
+                }
+                if ($method === 'pool') {
+                    return $this->client->pool(...$args);
                 }
                 $this->client = $this->client->{$method}(...$args);
                 return $this;
