@@ -14,10 +14,10 @@ if (!function_exists('cached_asset')) {
      * cached_asset
      *
      * @param  mixed $path
-     * @param  mixed $bustQuery
+     * @param  mixed $bust_query
      * @return mixed
      */
-    function cached_asset($path, $bustQuery = false)
+    function cached_asset($path, $bust_query = true)
     {
         // Get the full path to the asset.
         $realPath = public_path($path);
@@ -29,7 +29,7 @@ if (!function_exists('cached_asset')) {
         // Get the last updated timestamp of the file.
         $timestamp = filemtime($realPath);
 
-        if (!$bustQuery) {
+        if (!$bust_query) {
             // Get the extension of the file.
             $extension = pathinfo($realPath, PATHINFO_EXTENSION);
 
