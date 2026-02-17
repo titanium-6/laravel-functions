@@ -14,10 +14,10 @@ if (!function_exists('cached_asset')) {
      * cached_asset
      *
      * @param  mixed $path
-     * @param  mixed $bustQuery
+     * @param  mixed $bust_query
      * @return mixed
      */
-    function cached_asset($path, $bustQuery = false)
+    function cached_asset($path, $bust_query = true)
     {
         // Get the full path to the asset.
         $realPath = public_path($path);
@@ -29,7 +29,7 @@ if (!function_exists('cached_asset')) {
         // Get the last updated timestamp of the file.
         $timestamp = filemtime($realPath);
 
-        if (!$bustQuery) {
+        if (!$bust_query) {
             // Get the extension of the file.
             $extension = pathinfo($realPath, PATHINFO_EXTENSION);
 
@@ -288,6 +288,54 @@ if (!function_exists('convert_meters_to_feet')) {
         if ($meters === null) return null;
 
         $feet = $meters * 3.2808399;
+
+        if ($floor) {
+            $multiplier = pow(10, $precision);
+            return floor($feet * $multiplier) / $multiplier;
+        }
+
+        return round($feet, $precision);
+    }
+}
+
+if (!function_exists('convert_miles_to_meters')) {
+    /**
+     * convert_miles_to_meters
+     *
+     * @param  mixed $miles
+     * @param  mixed $precision
+     * @param  mixed $floor
+     * @return mixed
+     */
+    function convert_miles_to_meters($miles, $precision = 2, $floor = false)
+    {
+        if ($miles === null) return null;
+
+        $meters = $miles * 1609.344;
+
+        if ($floor) {
+            $multiplier = pow(10, $precision);
+            return floor($meters * $multiplier) / $multiplier;
+        }
+
+        return round($meters, $precision);
+    }
+}
+
+if (!function_exists('convert_miles_to_feet')) {
+    /**
+     * convert_miles_to_feet
+     *
+     * @param  mixed $miles
+     * @param  mixed $precision
+     * @param  mixed $floor
+     * @return mixed
+     */
+    function convert_miles_to_feet($miles, $precision = 2, $floor = false)
+    {
+        if ($miles === null) return null;
+
+        $feet = $miles * 5280;
 
         if ($floor) {
             $multiplier = pow(10, $precision);
@@ -1052,12 +1100,18 @@ if (!function_exists('app_url')) {
      * app_url
      *
      * @param  mixed $path
-     * @param  mixed $default
+     * @param  mixed $type
      * @return mixed
      */
-    function app_url($path = null, $default = false)
+    function app_url($path = null, $type = null)
     {
-        $url = $default ? config('app.default_url') : config('app.url');
+        // Backwards compatibility
+        if ($type === true) $type = 'default';
+        if ($type === false) $type = null;
+
+        if ($type) $type = $type . '_';
+
+        $url = config('app.' . $type . 'url');
 
         return rtrim($url, '/') . '/' . ltrim($path, '/');
     }
