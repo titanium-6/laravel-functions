@@ -39,7 +39,9 @@ return [
     | connection is set separately from the application default so the log can
     | go to Redis without moving every other queue.
     |
-    | redact_headers are replaced before storage.
+    | redact_headers adds to RouteLogWriter::ALWAYS_REDACT_HEADERS; max_request_bytes and
+    | max_response_bytes cap each stored body, 0 disables. All of it applies to both the
+    | log.route middleware and the log_route() helper.
     |
     */
 
@@ -48,13 +50,9 @@ return [
         'connection' => env('LOG_ROUTE_QUEUE_CONNECTION'),
         'queue' => env('LOG_ROUTE_QUEUE', 'log_route'),
         'store_response_body' => env('LOG_ROUTE_STORE_RESPONSE_BODY', true),
+        'max_request_bytes' => (int) env('LOG_ROUTE_MAX_REQUEST_BYTES', 10000),
         'max_response_bytes' => (int) env('LOG_ROUTE_MAX_RESPONSE_BYTES', 10000),
-        'redact_headers' => [
-            'authorization',
-            'cookie',
-            'proxy-authorization',
-            'x-api-key',
-        ],
+        'redact_headers' => [],
     ],
 
 ];

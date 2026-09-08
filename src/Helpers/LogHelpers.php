@@ -156,39 +156,32 @@ if (!function_exists('log_response')) {
 
 if (!function_exists('log_route')) {
     /**
-     * log_route
+     * Record one outbound API call in log_routes, the counterpart to the log.route middleware.
+     * Both hand their row to RouteLogWriter, so both get the same redaction, caps and mode.
      *
-     * @param  mixed $data
-     * @return mixed
+     * A console caller has no authenticated user or client IP, so both are left null rather than
+     * recording the scheduler's own.
+     *
+     * @param  array<string, mixed>  $data
+     * @return void
      */
     function log_route($data)
     {
-        $user = request()->user();
+        $user = app()->runningInConsole() ? null : request()->user();
 
-        $api_provider = $data['api_provider'];
-        $uri = $data['uri'];
-        $request_headers = $data['request_headers'] ?? [];
-        $request_body = $data['request_body'] ?? [];
-        $response_headers = $data['response_headers'] ?? [];
-        $response_body = $data['response_body'] ?? [];
-        $method = $data['method'];
-        $status_code = $data['status_code'];
-        $total_ms = $data['total_ms'] ?? null;
-
-        // @phpstan-ignore-next-line
-        $log = \App\Models\LogRoute::create([
+        \SgtCoder\LaravelFunctions\Support\RouteLogWriter::write([
             'model_type' => $user ? $user::class : null,
             'model_id' => $user->id ?? null,
-            'api_provider' => $api_provider,
-            'uri' => $uri,
-            'request_headers' => $request_headers,
-            'request_body' => $request_body,
-            'response_headers' => $response_headers,
-            'response_body' => $response_body,
-            'method' => $method,
-            'ip' => request()->ip(),
-            'http_code' => $status_code,
-            'total_ms' => $total_ms,
+            'api_provider' => $data['api_provider'],
+            'uri' => $data['uri'],
+            'request_headers' => $data['request_headers'] ?? [],
+            'request_body' => $data['request_body'] ?? [],
+            'response_headers' => $data['response_headers'] ?? [],
+            'response_body' => $data['response_body'] ?? [],
+            'method' => $data['method'],
+            'ip' => app()->runningInConsole() ? null : request()->ip(),
+            'http_code' => $data['status_code'],
+            'total_ms' => $data['total_ms'] ?? null,
         ]);
     }
 }
